@@ -8,7 +8,8 @@ import (
 )
 
 type Client interface {
-	Add(title, message string, duration time.Duration)
+	Add(title string, message string, duration time.Duration)
+	Load()
 }
 
 type Switch struct {
@@ -18,13 +19,14 @@ type Switch struct {
 
 func NewSwitch() Switch{
 	s := Switch{
-		client: Reminder{},
+		client: &Reminders{},
 	}
-	
+
 	s.commands = map[string] func() func(string) error {
 		"add": s.Add,
 	}
 	
+	s.client.Load()
 	return s
 }
 
@@ -33,7 +35,7 @@ func (s Switch) Switch() error {
 	cmd, ok := s.commands[cmdName]
 	
 	if !ok {
-		return fmt.Errorf("Invalid command: '%s'\n", cmdName)
+		return fmt.Errorf("invalid command: '%s'", cmdName)
 	}
 
 	return cmd()(cmdName)
@@ -53,6 +55,8 @@ func (s Switch) Add() func(string) error {
 	return func(cmd string) error {
 		createCmd := flag.NewFlagSet(cmd, flag.ExitOnError)
 		t, m, d := s.reminderFlags(createCmd)
+
+		fmt.Println("hello: ",*t, *m)
 
 		s.client.Add(*t, *m, *d)
 		return nil

@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"reminders-cli/client"
+	"reminder-cli/client"
 )
 
 var (
