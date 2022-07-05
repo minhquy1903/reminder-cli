@@ -5,27 +5,30 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"time"
 
 	"golang.org/x/exp/slices"
 )
 
 
 type Reminder struct {
-	ID       int        `json:"id"`
-	Title    string        `json:"title"`
-	Message  string        `json:"message"`
-	Duration time.Duration `json:"duration"`
+	ID       	int			`json:"id"`
+	Title    	string		`json:"title"`
+	Message  	string		`json:"message"`
+	Repeat		string		`json:"repeat"`
+	Handled		bool		`json:"handled"`
 }
 
 type Reminders []Reminder
 
 // Create calls the create API endpoint
-func (rs *Reminders) Add(title string, message string, duration time.Duration) {
+func (rs *Reminders) Add(title string, message string, repeat string) {
+	
 	rmd := Reminder{
+		ID: len(*rs) + 1,
 		Title:    title,
 		Message:  message,
-		Duration: duration,
+		Repeat: repeat,
+		Handled: false,
 	}
 
 	*rs = append(*rs, rmd)

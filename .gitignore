@@ -1,2 +1,4 @@
 notifier/node_modules/*
 bin
+
+db.json

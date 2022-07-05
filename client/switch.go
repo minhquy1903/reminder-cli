@@ -4,11 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"time"
 )
 
 type Client interface {
-	Add(title string, message string, duration time.Duration)
+	Add(title string, message string, repeat string)
 	Load()
 }
 
@@ -31,7 +30,7 @@ func NewSwitch() Switch{
 }
 
 func (s Switch) Switch() error {
-	cmdName := os.Args[1]
+	cmdName := os.Args[len(os.Args) - 1]
 	cmd, ok := s.commands[cmdName]
 	
 	if !ok {
@@ -53,24 +52,18 @@ func (s Switch) Help() {
 
 func (s Switch) Add() func(string) error {
 	return func(cmd string) error {
-		createCmd := flag.NewFlagSet(cmd, flag.ExitOnError)
-		t, m, d := s.reminderFlags(createCmd)
+		t, m, r := s.reminderFlags()
 
-		fmt.Println("hello: ",*t, *m)
-
-		s.client.Add(*t, *m, *d)
+		s.client.Add(*t, *m, *r)
 		return nil
 	}
 }
 
 // reminderFlags configures reminder specific flags for a command
-func (s Switch) reminderFlags(f *flag.FlagSet) (*string, *string, *time.Duration) {
-	t, m, d := "", "", time.Duration(0)
-	f.StringVar(&t, "title", "", "Reminder title")
-	f.StringVar(&t, "t", "", "Reminder title")
-	f.StringVar(&m, "message", "", "Reminder message")
-	f.StringVar(&m, "m", "", "Reminder message")
-	f.DurationVar(&d, "duration", 0, "Reminder time")
-	f.DurationVar(&d, "d", 0, "Reminder time")
-	return &t, &m, &d
+func (s Switch) reminderFlags() (*string, *string, *string) {
+	t := flag.String("t", "", "Notification title")
+	m := flag.String("m", "", "Notification message")
+	r := flag.String("r", "", "Will repeat in ...time")
+	flag.Parse()
+	return t, m, r
 }
