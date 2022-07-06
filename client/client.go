@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 )
-
 
 type Reminder struct {
 	ID       	int			`json:"id"`
@@ -70,12 +70,12 @@ func (rs *Reminders) Add(title string, message string, isRepeat bool, at string)
 		fmt.Println(err.Error())
 	}
 
-	ioutil.WriteFile("db.json", data, 0644)
+	ioutil.WriteFile(GetDBPath(), data, 0644)
 }
 
 // Load data from the db.json file
 func (rs *Reminders) Load() {
-	file, err := ioutil.ReadFile("db.json")
+	file, err := ioutil.ReadFile(GetDBPath())
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -88,3 +88,13 @@ func (rs *Reminders) Load() {
 	}
 }
 
+func GetDBPath() string {
+	
+	dirPath, err := os.Getwd()
+
+	if err != nil {
+		fmt.Println("Can not get dir path")
+	}
+
+	return dirPath + "/db.json"
+}

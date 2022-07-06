@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"reminder-cli/client"
 	"time"
 
@@ -13,10 +14,19 @@ import (
 )
 
 const (
-	DB = "db.json"
 	NotifierURL = "http://localhost:9000/notify"
 )
 
+func GetDBPath() string {
+	
+	dirPath, err := os.Getwd()
+
+	if err != nil {
+		fmt.Println("Can not get dir path")
+	}
+
+	return dirPath + "/db.json"
+}
 
 func main() {
 
@@ -89,7 +99,7 @@ func CallNotifier(body client.Reminder) {
 }
 
 func SetDoneReminder(id int) {
-	file, err := ioutil.ReadFile(DB)
+	file, err := ioutil.ReadFile(GetDBPath())
 
 	rs := &client.Reminders{}
 
@@ -117,11 +127,11 @@ func SetDoneReminder(id int) {
 		fmt.Println(err.Error())
 	}
 
-	ioutil.WriteFile("db.json", data, 0644)
+	ioutil.WriteFile(GetDBPath(), data, 0644)
 }
 
 func Load() client.Reminders{
-	file, err := ioutil.ReadFile(DB)
+	file, err := ioutil.ReadFile(GetDBPath())
 
 	rs := &client.Reminders{}
 
