@@ -19,6 +19,7 @@ app.post("/notify", (req, res) => {
 app.listen(port, () => console.log(`Notifier is running in port ${port}`))
 
 const notify = ({title, message}, cb) => {
+
     notifier.notify(
         {
             title: title || "Non title",
@@ -28,7 +29,7 @@ const notify = ({title, message}, cb) => {
             wait: true,
             reply: true,
             closeLabel: "Ok",
-            timeout: 5 
+            timeout: 8 
         },
         (err, response, reply) => cb(reply)
     )

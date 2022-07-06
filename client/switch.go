@@ -4,10 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 
 type Client interface {
-	Add(title string, message string, repeat string)
+	Add(title string, message string, isRepeat bool, at string)
 	Load()
 }
 
@@ -34,7 +35,8 @@ func (s Switch) Switch() error {
 	cmd, ok := s.commands[cmdName]
 	
 	if !ok {
-		return fmt.Errorf("invalid command: '%s'", cmdName)
+		Error("invalid command", cmdName)
+		return nil
 	}
 
 	return cmd()(cmdName)
@@ -52,18 +54,47 @@ func (s Switch) Help() {
 
 func (s Switch) Add() func(string) error {
 	return func(cmd string) error {
-		t, m, r := s.reminderFlags()
+		t, m, r, a := s.reminderFlags() // t = title, m = message, r = repeat, a = at
 
-		s.client.Add(*t, *m, *r)
+		if !ValidateTime(*a) {
+			Error("input format time wrong, format required: 'hh:mm'", *a)
+			return nil
+		} 
+
+		s.client.Add(*t, *m, *r, *a)
 		return nil
 	}
 }
 
 // reminderFlags configures reminder specific flags for a command
-func (s Switch) reminderFlags() (*string, *string, *string) {
-	t := flag.String("t", "", "Notification title")
+func (s Switch) reminderFlags() (*string, *string, *bool, *string) {
+	t := flag.String("t", "Reminder", "Notification title")
 	m := flag.String("m", "", "Notification message")
-	r := flag.String("r", "", "Will repeat in ...time")
+	r := flag.Bool("r", false, "Will repeat after duration <a>")
+	a := flag.String("a", "", "A timeline or a duration with flag < -r > | Time format: 'hh:mm'")
 	flag.Parse()
-	return t, m, r
+	return t, m, r, a
+}
+
+func ValidateTime(time string) bool {
+
+	if !strings.Contains(time, ":") {
+		return false
+	}
+
+	hh, mm, ok := SplitTime(time)
+
+	if !ok {
+		return false
+	}
+
+	if hh < 0 || hh > 23 {
+		return false
+	}
+
+	if mm < 0|| mm > 60 {
+		
+	}
+
+	return true
 }
