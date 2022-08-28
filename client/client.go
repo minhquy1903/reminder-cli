@@ -1,10 +1,7 @@
 package client
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -54,7 +51,6 @@ type Reminders []Reminder
 func (rs *Reminders) Add(title string, message string, isRepeat bool, at string) {
 	
 	rmd := Reminder{
-		ID: len(*rs) + 1,
 		Title:    title,
 		Message:  message,
 		IsRepeat: isRepeat,
@@ -64,37 +60,25 @@ func (rs *Reminders) Add(title string, message string, isRepeat bool, at string)
 
 	*rs = append(*rs, rmd)
 
-	data, err := json.Marshal(rs)
+	sqlQuery := "INSERT INTO reminders (title, message, is_repeat, at) VALUES ($1, $2, $3, $4)"
 
+	_, err := Postgres.SQL.Exec(sqlQuery, title, message, isRepeat, at)
 	if err != nil {
-		fmt.Println(err.Error())
+		panic(err)
 	}
-
-	ioutil.WriteFile(GetDBPath(), data, 0644)
 }
 
 // Load data from the db.json file
 func (rs *Reminders) Load() {
-	file, err := ioutil.ReadFile(GetDBPath())
+	// file, err := ioutil.ReadFile(GetDBPath())
 
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	// if err != nil {
+	// 	fmt.Println(err.Error())
+	// }
 
-	err = json.Unmarshal(file, rs)
+	// err = json.Unmarshal(file, rs)
 
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-}
-
-func GetDBPath() string {
-	
-	dirPath, err := os.Getwd()
-
-	if err != nil {
-		fmt.Println("Can not get dir path")
-	}
-
-	return dirPath + "/db.json"
+	// if err != nil {
+	// 	fmt.Println(err.Error())
+	// }
 }

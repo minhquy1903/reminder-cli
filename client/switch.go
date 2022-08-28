@@ -25,8 +25,7 @@ func NewSwitch() Switch{
 	s.commands = map[string] func() func(string) error {
 		"add": s.Add,
 	}
-	
-	s.client.Load()
+
 	return s
 }
 
@@ -93,7 +92,7 @@ func ValidateTime(time string) bool {
 	}
 
 	if mm < 0|| mm > 60 {
-		
+		return false
 	}
 
 	return true

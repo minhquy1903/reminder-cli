@@ -13,8 +13,8 @@ import (
 	"github.com/robfig/cron"
 )
 
-const (
-	NotifierURL = "http://localhost:9000/notify"
+var (
+	NotifierURL = os.Getenv("NOTIFIER_ENDPOINT")
 )
 
 func GetDBPath() string {
@@ -58,7 +58,7 @@ func SetReminder(rmd client.Reminder, c *cron.Cron) {
 	// Get the spec string
 	spec := rmd.GetSpec()
 
-	_, err := c.AddFunc(spec, func() {
+	err := c.AddFunc(spec, func() {
 		CallNotifier(rmd)
 	})
 
